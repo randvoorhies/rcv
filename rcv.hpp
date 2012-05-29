@@ -1,6 +1,8 @@
 #ifndef RCV_HPP
 #define RCV_HPP
 
+#include <time.h>
+
 namespace rcv
 {
   //! Concatenate the left and the right images horizontally
@@ -9,6 +11,22 @@ namespace rcv
   //! Concatenate the top and the bottom images vertically
   cv::Mat vcat(cv::Mat top, cv::Mat bottom, cv::Scalar fill = cv::Scalar(0));
 
+  //! A simple class for timing things.
+  class Timer
+  {
+    public:
+      //! Construct the timer - calls start() 
+      Timer();
+
+      //! Start timing
+      void start();
+
+      //! End timing, and elapsed time between start() and end() calls in seconds
+      double end();
+
+    private:
+      timespec start_, end_; 
+  };
 
   // ######################################################################
   cv::Mat hcat(cv::Mat left, cv::Mat right, cv::Scalar fill)
@@ -45,5 +63,27 @@ namespace rcv
 
     return ret;
   }
+
+  // ######################################################################
+  Timer::Timer()
+  {
+    start();
+  }
+
+  // ######################################################################
+  void Timer::start()
+  {
+    clock_gettime(CLOCK_REALTIME, &start_);
+  }
+
+  // ######################################################################
+  double Timer::end()
+  {
+    clock_gettime(CLOCK_REALTIME, &end_);
+    return (end_.tv_sec - start_.tv_sec) +
+      (double)(end_.tv_nsec - start_.tv_nsec) / 1000000000.0;
+  }
+
+
 }
 #endif // RCV_HPP
