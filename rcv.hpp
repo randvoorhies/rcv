@@ -11,6 +11,10 @@ namespace rcv
   //! Concatenate the top and the bottom images vertically
   cv::Mat vcat(cv::Mat top, cv::Mat bottom, cv::Scalar fill = cv::Scalar(0));
 
+  //! Plot the values as a simple line plot
+  template<class T, class Q>
+  cv::Mat plot(T const * const values, size_t num_values, Q max_value, cv::Size plot_size);
+
   //! A simple class for timing things.
   class Timer
   {
@@ -84,6 +88,26 @@ namespace rcv
       (double)(end_.tv_nsec - start_.tv_nsec) / 1000000000.0;
   }
 
+  // ######################################################################
+  template<class T, class Q>
+  cv::Mat plot(T const * const values, size_t num_values, Q max_value, cv::Size plot_size)
+  {
+    cv::Mat plot = cv::Mat::zeros(plot_size, CV_8UC1);
+
+    int old_x;
+    int old_y;
+    for(size_t i=0; i<num_values; ++i)
+    {
+      int x = float(i)/float(num_values) * plot_size.width;
+      int y = float(values[i]) / float(max_value) * plot_size.height;
+      if(i == 0) { old_x = x; old_y = y; }
+
+      cv::line(plot, cv::Point(old_x, plot_size.height - old_y), cv::Point(x, plot_size.height - y), cv::Scalar(255));
+      old_x = x;
+      old_y = y;
+    }
+    return plot;
+  }
 
 }
 #endif // RCV_HPP
