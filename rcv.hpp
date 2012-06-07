@@ -94,13 +94,12 @@ namespace rcv
   {
     cv::Mat plot = cv::Mat::zeros(plot_size, CV_8UC1);
 
-    int old_x;
-    int old_y;
+    int old_x = 0;
+    int old_y = 0;
     for(size_t i=0; i<num_values; ++i)
     {
       int x = float(i)/float(num_values) * plot_size.width;
       int y = float(values[i]) / float(max_value) * plot_size.height;
-      if(i == 0) { old_x = x; old_y = y; }
 
       cv::line(plot, cv::Point(old_x, plot_size.height - old_y), cv::Point(x, plot_size.height - y), cv::Scalar(255));
       old_x = x;
