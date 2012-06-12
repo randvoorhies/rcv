@@ -13,7 +13,7 @@ namespace rcv
 
   //! Plot the values as a simple line plot
   template<class T, class U>
-  cv::Mat plot(T const * const values, size_t num_values, U max_value, cv::Size plot_size);
+  cv::Mat plot(T const * const values, size_t num_values, U max_value, cv::Size plot_size, cv::Scalar linecolor=cv::Scalar(255), int linewidth=2);
 
   //! A simple class for timing things.
   class Timer
@@ -90,7 +90,7 @@ namespace rcv
 
   // ######################################################################
   template<class T, class U>
-  cv::Mat plot(T const * const values, size_t num_values, U max_value, cv::Size plot_size)
+  cv::Mat plot(T const * const values, size_t num_values, U max_value, cv::Size plot_size, cv::Scalar linecolor=cv::Scalar(255), int linewidth=1)
   {
     cv::Mat plot = cv::Mat::zeros(plot_size, CV_8UC1);
 
@@ -101,7 +101,7 @@ namespace rcv
       int x = float(i)/float(num_values) * plot_size.width;
       int y = float(values[i]) / float(max_value) * plot_size.height;
 
-      cv::line(plot, cv::Point(old_x, plot_size.height - old_y), cv::Point(x, plot_size.height - y), cv::Scalar(255));
+      cv::line(plot, cv::Point(old_x, plot_size.height - old_y), cv::Point(x, plot_size.height - y), linecolor, linewidth);
       old_x = x;
       old_y = y;
     }
