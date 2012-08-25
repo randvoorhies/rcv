@@ -13,7 +13,7 @@ namespace rcv
 
   //! Plot the values as a simple line plot
   template<class T, class U>
-  cv::Mat plot(T const * const values, size_t num_values, U max_value, cv::Size plot_size, cv::Scalar linecolor=cv::Scalar(255), int linewidth=2);
+  cv::Mat plot(T const * const values, size_t num_values, cv::Size plot_size, U min_value, U max_value, cv::Scalar line_color=cv::Scalar(255), int line_width=2);
 
   //! A simple class for timing things.
   class Timer
@@ -90,22 +90,23 @@ namespace rcv
 
   // ######################################################################
   template<class T, class U>
-  cv::Mat plot(T const * const values, size_t num_values, U max_value, cv::Size plot_size, cv::Scalar linecolor=cv::Scalar(255), int linewidth=1)
+  cv::Mat plot(T const * const values, size_t num_values, cv::Size plot_size, U min_value, U max_value, cv::Scalar line_color=cv::Scalar(255), int line_width=1)
   {
-    cv::Mat plot = cv::Mat::zeros(plot_size, CV_8UC1);
+    cv::Mat plot = cv::Mat::zeros(plot_size, CV_8UC3);
 
     int old_x = 0;
     int old_y = 0;
     for(size_t i=0; i<num_values; ++i)
     {
       int x = float(i)/float(num_values) * plot_size.width;
-      int y = float(values[i]) / float(max_value) * plot_size.height;
+      int y = (float(values[i] - min_value) / float(max_value - min_value)) * plot_size.height;
+      y = std::max(0, std::min(plot_size.height-1, y));
 
-      cv::line(plot, cv::Point(old_x, plot_size.height - old_y), cv::Point(x, plot_size.height - y), linecolor, linewidth);
+      cv::line(plot, cv::Point(old_x, plot_size.height - old_y - 1), cv::Point(x, plot_size.height - y - 1), line_color, line_width);
       old_x = x;
       old_y = y;
     }
-    return plot;
+    return plot; 
   }
 
 }
