@@ -2,38 +2,28 @@
 #define RCV_HPP
 
 #include <time.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <type_traits>
+#include <typeindex>
 
 namespace rcv
 {
-  //! Concatenate the left and the right images horizontally
-  cv::Mat hcat(cv::Mat left, cv::Mat right, cv::Scalar fill = cv::Scalar(0));
-
-  //! Concatenate the top and the bottom images vertically
-  cv::Mat vcat(cv::Mat top, cv::Mat bottom, cv::Scalar fill = cv::Scalar(0));
-
-  //! Plot the values as a simple line plot
-  template<class T, class U>
-  cv::Mat plot(T const * const values, size_t num_values, cv::Size plot_size, U min_value, U max_value, cv::Scalar line_color=cv::Scalar(255), int line_width=2);
-
-  //! A simple class for timing things.
-  class Timer
-  {
-    public:
-      //! Construct the timer - calls start() 
-      Timer();
-
-      //! Start timing
-      void start();
-
-      //! End timing, and elapsed time between start() and end() calls in seconds
-      double end();
-
-    private:
-      timespec start_, end_; 
-  };
+  //! Get the CV_ flag for a given numeric type
+  /*! E.g. type2cv<int16_t>::value will resolve to CV_16S */
+  template<class T> struct type2cv {};
+  template<> struct type2cv<uint8_t>  { static const int value = CV_8U;  };
+  template<> struct type2cv<int8_t>   { static const int value = CV_8S;  };
+  template<> struct type2cv<uint16_t> { static const int value = CV_16U; };
+  template<> struct type2cv<int16_t>  { static const int value = CV_16S; };
+  template<> struct type2cv<int32_t>  { static const int value = CV_32S; };
+  template<> struct type2cv<float>    { static const int value = CV_32F; };
+  template<> struct type2cv<double>   { static const int value = CV_64F; };
 
   // ######################################################################
-  cv::Mat hcat(cv::Mat left, cv::Mat right, cv::Scalar fill)
+  //! Concatenate the left and the right images horizontally
+  cv::Mat hcat(cv::Mat left, cv::Mat right, cv::Scalar fill = cv::Scalar(0))
   {
     assert(left.type() == right.type());
 
@@ -51,7 +41,8 @@ namespace rcv
   }
 
   // ######################################################################
-  cv::Mat vcat(cv::Mat top, cv::Mat bottom, cv::Scalar fill)
+  //! Concatenate the top and the bottom images vertically
+  cv::Mat vcat(cv::Mat top, cv::Mat bottom, cv::Scalar fill = cv::Scalar(0))
   {
     assert(top.type() == bottom.type());
 
@@ -69,37 +60,41 @@ namespace rcv
   }
 
   // ######################################################################
-  Timer::Timer()
-  {
-    start();
-  }
+  class AutoScaleIndicator { };
+  AutoScaleIndicator autoscale;
+
+  template<class Iterator, class MaxScaleValue> 
+    auto get_max_value(Iterator const begin, Iterator const end, MaxScaleValue max_value __attribute__ ((unused))) -> 
+    typename std::enable_if<std::is_same<MaxScaleValue, AutoScaleIndicator>::value, typename std::remove_reference<decltype(*begin)>::type>::type
+    { return *std::max_element(begin, end); }
+
+  template<class Iterator, class MaxScaleValue> 
+    auto get_max_value(Iterator const begin  __attribute__ ((unused)), Iterator const end  __attribute__ ((unused)), MaxScaleValue max_value) -> 
+    typename std::enable_if<!std::is_same<MaxScaleValue, AutoScaleIndicator>::value, typename std::remove_reference<decltype(*begin)>::type>::type
+    { return max_value; }
 
   // ######################################################################
-  void Timer::start()
+  //! Plot the values as a simple line plot
+  template<class Iterator, class MinScaleValue=int, class MaxScaleValue=AutoScaleIndicator>
+  cv::Mat plot(Iterator const begin, Iterator const end, cv::Size plot_size,
+      MinScaleValue min_value = 0, MaxScaleValue max_value = autoscale,
+      cv::Scalar line_color=cv::Scalar(255), int line_width=1)
   {
-    clock_gettime(CLOCK_REALTIME, &start_);
-  }
+    typedef typename std::remove_reference<decltype(*begin)>::type T;
 
-  // ######################################################################
-  double Timer::end()
-  {
-    clock_gettime(CLOCK_REALTIME, &end_);
-    return (end_.tv_sec - start_.tv_sec) +
-      (double)(end_.tv_nsec - start_.tv_nsec) / 1000000000.0;
-  }
-
-  // ######################################################################
-  template<class T, class U>
-  cv::Mat plot(T const * const values, size_t num_values, cv::Size plot_size, U min_value, U max_value, cv::Scalar line_color=cv::Scalar(255), int line_width=1)
-  {
     cv::Mat plot = cv::Mat::zeros(plot_size, CV_8UC3);
+
+    T min_value_ = min_value;
+    T max_value_ = get_max_value(begin, end, max_value);
 
     int old_x = 0;
     int old_y = 0;
-    for(size_t i=0; i<num_values; ++i)
+    size_t const num_values = std::distance(begin, end);
+    Iterator it = begin;
+    for(size_t i=0; i<num_values; ++i, ++it)
     {
       int x = float(i)/float(num_values) * plot_size.width;
-      int y = (float(values[i] - min_value) / float(max_value - min_value)) * plot_size.height;
+      int y = (float(*it - min_value_) / float(max_value_ - min_value_)) * plot_size.height;
       y = std::max(0, std::min(plot_size.height-1, y));
 
       cv::line(plot, cv::Point(old_x, plot_size.height - old_y - 1), cv::Point(x, plot_size.height - y - 1), line_color, line_width);
@@ -111,3 +106,4 @@ namespace rcv
 
 }
 #endif // RCV_HPP
+
