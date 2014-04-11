@@ -41,6 +41,32 @@ namespace rcv
   }
 
   // ######################################################################
+  //! Concatenate a set of images horizontally
+  cv::Mat hcat(std::vector<cv::Mat> const & images, cv::Scalar fill = cv::Scalar(0))
+  {
+    if(images.empty()) return cv::Mat();
+    if(images.size() == 1) return images[0];
+
+    assert(std::all_of(images.begin(), images.end(),
+          [images](cv::Mat const & image) { return image.type() == images[0].type(); }));
+
+    int const rows = std::max_element(images.begin(), images.end(), [](cv::Mat a, cv::Mat b) { return a.rows < b.rows; })->rows;
+    int cols = std::accumulate(images.begin(), images.end(), 0, [](int n, cv::Mat m) { return n+m.cols; });
+
+    cv::Mat ret(rows, cols, images[0].type(), fill);
+
+    int c = 0;
+    for(cv::Mat const & image : images)
+    {
+      cv::Mat roi = ret(cv::Rect(c, 0, image.cols, image.rows));
+      image.copyTo(roi);
+      c += image.cols;
+    }
+
+    return ret;
+  }
+ 
+  // ######################################################################
   //! Concatenate the top and the bottom images vertically
   cv::Mat vcat(cv::Mat top, cv::Mat bottom, cv::Scalar fill = cv::Scalar(0))
   {
@@ -55,6 +81,33 @@ namespace rcv
 
     cv::Mat bottom_ret_roi = ret(cv::Rect(0, top.rows, bottom.cols, bottom.rows));
     bottom.copyTo(bottom_ret_roi);
+
+    return ret;
+  }
+
+  // ######################################################################
+  //! Concatenate a set of images vertically
+  cv::Mat vcat(std::vector<cv::Mat> const & images, cv::Scalar fill = cv::Scalar(0))
+  {
+    if(images.empty()) return cv::Mat();
+    if(images.size() == 1) return images[0];
+
+    assert(std::all_of(images.begin(), images.end(),
+          [images](cv::Mat const & image) { return image.type() == images[0].type(); }));
+
+    int rows = std::accumulate(images.begin(), images.end(), 0, [](int n, cv::Mat m) { return n+m.rows; });
+    int const cols = std::max_element(images.begin(), images.end(), [](cv::Mat a, cv::Mat b) { return a.cols < b.cols; })->cols;
+
+    cv::Mat ret(rows, cols, images[0].type(), fill);
+
+    int r = 0;
+    for(cv::Mat const & image : images)
+    {
+      cv::Mat roi = ret(cv::Rect(0, r, image.cols, image.rows));
+      image.copyTo(roi);
+      r += image.rows;
+    }
+
 
     return ret;
   }
