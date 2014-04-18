@@ -7,6 +7,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <type_traits>
 #include <typeindex>
+#include <stdexcept>
 
 namespace rcv
 {
@@ -156,6 +157,115 @@ namespace rcv
     }
     return plot; 
   }
+
+  // ######################################################################
+  //! Colorize the input using Dave Green's 'cubehelix' algorithm
+  /*! This implementation based on Jim Davenport's python implementation found here: https://github.com/jradavenport/cubehelix/
+*/
+  class cubehelix
+  {
+    public:
+      //! Construct a cubehelix object and initialize it's mapping tables
+      /*! 
+        @param start The starting position in the color space. 0=blue, 1=red, 2=green. Defaults to 0.5.
+
+        @param rot The number of rotations through the rainbow. Can be positive 
+        or negative, indicating direction of rainbow. Negative values
+        correspond to Blue->Red direction.
+
+        @param gamma The gamma correction for intensity.
+
+        @param hue The hue intensity factor.
+
+        @param reverse Set to True to reverse the color map. Will go from black to
+        white. Good for density plots where shade~density.
+        */
+      cubehelix(float start=0.5, float rot=-1.5, float gamma=1.0, float hue=1.2, bool reverse=false) :
+        nlev(256)
+    {
+      // Set up the parameters
+      std::vector<double> fract(nlev);
+      std::iota(fract.begin(), fract.end(), 0);
+      for(auto & f : fract) f /= (nlev-1.0);
+
+      std::vector<double> angle(nlev);
+      std::transform(fract.begin(), fract.end(), angle.begin(),
+          [start, rot](double f) { return 2*M_PI * (start/3.0 + 1.0 + rot*f); });
+
+      for(auto & f : fract) f = std::pow(f, gamma);
+
+      std::vector<double> amp(nlev);
+      std::transform(fract.begin(), fract.end(), amp.begin(),
+          [hue](double f) { return hue * f * (1.0-f)/2.0; });
+
+      // compute the RGB vectors according to main equations
+      red_.resize(nlev);
+      grn_.resize(nlev);
+      blu_.resize(nlev);
+      for(size_t i=0; i<nlev; ++i)
+      {
+        double const s = std::sin(angle[i]);
+        double const c = std::cos(angle[i]);
+        double const f = fract[i];
+        double const a = amp[i];
+        red_[i] = std::max(0.0, std::min(1.0, f+a*(-0.14861*c + 1.78277*s)))*255;
+        grn_[i] = std::max(0.0, std::min(1.0, f+a*(-0.29227*c - 0.90649*s)))*255;
+        blu_[i] = std::max(0.0, std::min(1.0, f+a*(1.97294*c )))*255;
+      }
+
+      if(reverse)
+      {
+        std::reverse(red_.begin(), red_.end());
+        std::reverse(grn_.begin(), grn_.end());
+        std::reverse(blu_.begin(), blu_.end());
+      }
+    }
+
+      //! Map the values of an input image to cubehelix colors
+      cv::Mat operator()(cv::Mat const & input)
+      {
+        if(input.channels() != 1)
+          throw std::runtime_error(
+              "Too many channels (" + std::to_string(input.channels()) + ") in input image");
+
+        switch(CV_MAT_TYPE(input.type()))
+        {
+          case CV_8U: return process<uint8_t>(input);
+          case CV_8S: return process<int8_t>(input);
+          case CV_16U: return process<uint16_t>(input);
+          case CV_16S: return process<int16_t>(input);
+          case CV_32S: return process<int32_t>(input);
+          case CV_32F: return process<float>(input);
+          case CV_64F: return process<double>(input);
+          default: throw std::runtime_error("Unsupported data type: " +
+                       std::to_string(CV_MAT_TYPE(input.type())));
+        };
+      }
+
+   private:
+      template<class T>
+      cv::Mat process(cv::Mat const & input)
+      {
+        double minv, maxv;
+        cv::minMaxLoc(input, &minv, &maxv);
+
+        if(minv == maxv) return cv::Mat::zeros(input.rows, input.cols, CV_8UC3);
+        cv::Mat ret(input.size(), CV_8UC3);
+
+
+        std::transform(input.begin<T>(), input.end<T>(), ret.begin<cv::Vec3b>(),
+            [this, minv, maxv](T const v) 
+            { 
+              size_t const idx = (v - minv) / (maxv - minv) * (nlev - 1);
+              return cv::Vec3b(red_[idx], blu_[idx], grn_[idx]);
+            });
+
+        return ret;
+      }
+
+      size_t const nlev;
+      std::vector<uint8_t> red_, blu_, grn_;
+  };
 
 }
 #endif // RCV_HPP
