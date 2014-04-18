@@ -160,8 +160,7 @@ namespace rcv
 
   // ######################################################################
   //! Colorize the input using Dave Green's 'cubehelix' algorithm
-  /*! This implementation based on Jim Davenport's python implementation found here: https://github.com/jradavenport/cubehelix/
-*/
+  /*! This implementation based on Jim Davenport's python implementation found here: https://github.com/jradavenport/cubehelix/ */
   class cubehelix
   {
     public:
@@ -251,7 +250,6 @@ namespace rcv
 
         if(minv == maxv) return cv::Mat::zeros(input.rows, input.cols, CV_8UC3);
         cv::Mat ret(input.size(), CV_8UC3);
-
 
         std::transform(input.begin<T>(), input.end<T>(), ret.begin<cv::Vec3b>(),
             [this, minv, maxv](T const v) 
