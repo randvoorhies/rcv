@@ -48,6 +48,6 @@ int main()
 
   return 0;
 }
-
-
 ```
+
+_Beware that I really haven't optimized any of this code! The image concatentation is particuarly inefficient, as it involves copying a ton of data when concatenating many images. If you would like to speed this up, let me know as I have some ideas of how to do it._
