@@ -4,7 +4,7 @@ rcv::
 
 This is a set of general purpose OpenCV helpers that I have accumulated over the years. Here's an example of some of the library's functionality:
 
-```(cpp)
+```cpp
 #include "rcv.hpp"
 
 int main()
