@@ -9,6 +9,8 @@
 #include <typeindex>
 #include <stdexcept>
 
+#include <iostream>
+
 namespace rcv
 {
   //! Get the CV_ flag for a given numeric type
@@ -164,8 +166,35 @@ namespace rcv
   class cubehelix
   {
     public:
+
+      struct create
+      {
+        create() :
+          nlev_(256), start_(0.5), rot_(-1.5), gamma_(1.0), hue_(1.2), reverse_(false) 
+        { }
+
+        operator cubehelix()
+        {
+          return cubehelix(nlev_, start_, rot_, gamma_, hue_, reverse_);
+        }
+
+        create & nlev(size_t val)  { nlev_    = val; return *this; }
+        create & start(float val)  { start_   = val; return *this; }
+        create & rot(float val)    { rot_     = val; return *this; }
+        create & gamma(float val)  { gamma_   = val; return *this; }
+        create & hue(float val)    { hue_     = val; return *this; }
+        create & reverse()         { reverse_ = !reverse_; return *this; }
+
+        size_t nlev_;
+        float start_, rot_, gamma_, hue_;
+        bool reverse_;
+      };
+
+
       //! Construct a cubehelix object and initialize it's mapping tables
       /*! 
+        @param nlev The number of color levels in the color map.
+
         @param start The starting position in the color space. 0=blue, 1=red, 2=green. Defaults to 0.5.
 
         @param rot The number of rotations through the rainbow. Can be positive 
@@ -179,8 +208,8 @@ namespace rcv
         @param reverse Set to True to reverse the color map. Will go from black to
         white. Good for density plots where shade~density.
         */
-      cubehelix(float start=0.5, float rot=-1.5, float gamma=1.0, float hue=1.2, bool reverse=false) :
-        nlev(256)
+      cubehelix(size_t nlev=256, float start=0.5, float rot=-1.5, float gamma=1.0, float hue=1.2, bool reverse=false) :
+        nlev(nlev)
     {
       // Set up the parameters
       std::vector<double> fract(nlev);
@@ -207,10 +236,11 @@ namespace rcv
         double const c = std::cos(angle[i]);
         double const f = fract[i];
         double const a = amp[i];
-        red_[i] = std::max(0.0, std::min(1.0, f+a*(-0.14861*c + 1.78277*s)))*255;
-        grn_[i] = std::max(0.0, std::min(1.0, f+a*(-0.29227*c - 0.90649*s)))*255;
-        blu_[i] = std::max(0.0, std::min(1.0, f+a*(1.97294*c )))*255;
+        red_[i] = std::max(0.0, std::min( 255.0, std::round((f+a*(-0.14861*c + 1.78277*s))*255.0)));
+        grn_[i] = std::max(0.0, std::min( 255.0, std::round((f+a*(-0.29227*c - 0.90649*s))*255.0)));
+        blu_[i] = std::max(0.0, std::min( 255.0, std::round((f+a*(1.97294*c))*255.0)));
       }
+
 
       if(reverse)
       {
@@ -229,13 +259,13 @@ namespace rcv
 
         switch(CV_MAT_TYPE(input.type()))
         {
-          case CV_8U: return process<uint8_t>(input);
-          case CV_8S: return process<int8_t>(input);
-          case CV_16U: return process<uint16_t>(input);
-          case CV_16S: return process<int16_t>(input);
-          case CV_32S: return process<int32_t>(input);
-          case CV_32F: return process<float>(input);
-          case CV_64F: return process<double>(input);
+          case CV_8U:  std::cout << "uint8_t" << std::endl;return process<uint8_t>(input);
+          case CV_8S:  std::cout << "int8_t" << std::endl;return process<int8_t>(input);
+          case CV_16U: std::cout << "uint16_t" << std::endl;return process<uint16_t>(input);
+          case CV_16S: std::cout << "int16_t" << std::endl;return process<int16_t>(input);
+          case CV_32S: std::cout << "int32_t" << std::endl;return process<int32_t>(input);
+          case CV_32F: std::cout << "float" << std::endl;return process<float>(input);
+          case CV_64F: std::cout << "double" << std::endl;return process<double>(input);
           default: throw std::runtime_error("Unsupported data type: " +
                        std::to_string(CV_MAT_TYPE(input.type())));
         };
@@ -247,6 +277,7 @@ namespace rcv
       {
         double minv, maxv;
         cv::minMaxLoc(input, &minv, &maxv);
+        std::cout << "minmax: " << minv << ", " << maxv << std::endl;
 
         if(minv == maxv) return cv::Mat::zeros(input.rows, input.cols, CV_8UC3);
         cv::Mat ret(input.size(), CV_8UC3);
