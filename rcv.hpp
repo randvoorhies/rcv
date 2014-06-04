@@ -127,18 +127,28 @@ namespace rcv
     typename std::enable_if<!std::is_same<MaxScaleValue, AutoScaleIndicator>::value, typename std::remove_reference<decltype(*begin)>::type>::type
     { return max_value; }
 
+  template<class Iterator, class MaxScaleValue> 
+    auto get_min_value(Iterator const begin, Iterator const end, MaxScaleValue min_value __attribute__ ((unused))) -> 
+    typename std::enable_if<std::is_same<MaxScaleValue, AutoScaleIndicator>::value, typename std::remove_reference<decltype(*begin)>::type>::type
+    { return *std::min_element(begin, end); }
+
+  template<class Iterator, class MaxScaleValue> 
+    auto get_min_value(Iterator const begin  __attribute__ ((unused)), Iterator const end  __attribute__ ((unused)), MaxScaleValue min_value) -> 
+    typename std::enable_if<!std::is_same<MaxScaleValue, AutoScaleIndicator>::value, typename std::remove_reference<decltype(*begin)>::type>::type
+    { return min_value; }
+
   // ######################################################################
   //! Plot the values as a simple line plot
-  template<class Iterator, class MinScaleValue=int, class MaxScaleValue=AutoScaleIndicator>
+  template<class Iterator, class MinScaleValue=AutoScaleIndicator, class MaxScaleValue=AutoScaleIndicator>
   cv::Mat plot(Iterator const begin, Iterator const end, cv::Size plot_size,
-      MinScaleValue min_value = 0, MaxScaleValue max_value = autoscale,
+      MinScaleValue min_value = autoscale, MaxScaleValue max_value = autoscale,
       cv::Scalar line_color=cv::Scalar(255), int line_width=1)
   {
     typedef typename std::remove_reference<decltype(*begin)>::type T;
 
     cv::Mat plot = cv::Mat::zeros(plot_size, CV_8UC3);
 
-    T min_value_ = min_value;
+    T min_value_ = get_min_value(begin, end, min_value);
     T max_value_ = get_max_value(begin, end, max_value);
 
     int old_x = 0;
