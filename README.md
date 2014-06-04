@@ -45,10 +45,12 @@ int main()
   cv::Mat plot = rcv::plot(values.begin(), values.end(), cv::Size(300, 100));
   
   // Plot with a fixed scale (from 0 to 1) and a red line
-  cv::Mat plot = rcv::plot(values.begin(), values.end(), cv::Size(300, 100), 0.0, 1.0, cv::Scalar(0,0,255));
+  cv::Mat plot = rcv::plot(values.begin(), values.end(), cv::Size(300, 100),
+                           0.0, 1.0, cv::Scalar(0,0,255));
 
   // Plot with an autoscaled minimum value, a fixed maximum value and a blue line
-  cv::Mat plot = rcv::plot(values.begin(), values.end(), cv::Size(300, 100), rcv::autoscale, 100.0, cv::Scalar(0,0,255));
+  cv::Mat plot = rcv::plot(values.begin(), values.end(), cv::Size(300, 100),
+                           rcv::autoscale, 100.0, cv::Scalar(0,0,255));
   
   ////////////////// Color Mapping //////////////////
   
