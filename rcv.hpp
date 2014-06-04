@@ -9,6 +9,8 @@
 #include <typeindex>
 #include <stdexcept>
 
+#include <iostream>
+
 namespace rcv
 {
   //! Get the CV_ flag for a given numeric type
@@ -21,6 +23,85 @@ namespace rcv
   template<> struct type2cv<int32_t>  { static const int value = CV_32S; };
   template<> struct type2cv<float>    { static const int value = CV_32F; };
   template<> struct type2cv<double>   { static const int value = CV_64F; };
+
+  //! Convert a CV_* type (from cv::Mat.type()) to a human readable string
+  /*! Implementation ripped from http://stackoverflow.com/a/12336381/237092 */
+  std::string type2string(int imgTypeInt)
+  {
+    int numImgTypes = 35; // 7 base types, with five channel options each (none or C1, ..., C4)
+
+    int enum_ints[] = {
+      CV_8U,  CV_8UC1,  CV_8UC2,  CV_8UC3,  CV_8UC4,
+      CV_8S,  CV_8SC1,  CV_8SC2,  CV_8SC3,  CV_8SC4,
+      CV_16U, CV_16UC1, CV_16UC2, CV_16UC3, CV_16UC4,
+      CV_16S, CV_16SC1, CV_16SC2, CV_16SC3, CV_16SC4,
+      CV_32S, CV_32SC1, CV_32SC2, CV_32SC3, CV_32SC4,
+      CV_32F, CV_32FC1, CV_32FC2, CV_32FC3, CV_32FC4,
+      CV_64F, CV_64FC1, CV_64FC2, CV_64FC3, CV_64FC4};
+
+    static std::string const enum_strings[] = {
+      "CV_8U",  "CV_8UC1",  "CV_8UC2",  "CV_8UC3",  "CV_8UC4",
+      "CV_8S",  "CV_8SC1",  "CV_8SC2",  "CV_8SC3",  "CV_8SC4",
+      "CV_16U", "CV_16UC1", "CV_16UC2", "CV_16UC3", "CV_16UC4",
+      "CV_16S", "CV_16SC1", "CV_16SC2", "CV_16SC3", "CV_16SC4",
+      "CV_32S", "CV_32SC1", "CV_32SC2", "CV_32SC3", "CV_32SC4",
+      "CV_32F", "CV_32FC1", "CV_32FC2", "CV_32FC3", "CV_32FC4",
+      "CV_64F", "CV_64FC1", "CV_64FC2", "CV_64FC3", "CV_64FC4"};
+
+    for(int i=0; i<numImgTypes; i++)
+    {
+      if(imgTypeInt == enum_ints[i]) return enum_strings[i];
+    }
+    return "unknown image type";
+  }
+
+  //! Dispatch an image to a function which takes the underlying image data type as a template parameter
+  /*! Example:
+   * @code
+   * template<class T>
+   *   bool my_function(float param1, float param2, cv::Mat image, float param3)
+   *   {
+   *     assert(image.channels() == 1);
+   *     return (image.at<T>(0,0) * param1 + param2 < param3);
+   *   }
+   *
+   * cv::Mat my_unknown_matrix = getMatrixFromSomewhere();
+   *
+   * bool result = RCV_DISPATCH(my_unknown_matrix.type(), my_function,
+   *   1.0, 2.0, my_unknown_matrix, 3.0);
+   * @endcode
+   * */
+#define RCV_DISPATCH(type, function_name, ...)                                               \
+  [&]() {                                                                                    \
+    switch(CV_MAT_TYPE(type))                                                                \
+    {                                                                                        \
+      case CV_8U:  return function_name<uint8_t>(__VA_ARGS__);                               \
+      case CV_8S:  return function_name<int8_t>(__VA_ARGS__);                                \
+      case CV_16U: return function_name<uint16_t>(__VA_ARGS__);                              \
+      case CV_16S: return function_name<int16_t>(__VA_ARGS__);                               \
+      case CV_32S: return function_name<int32_t>(__VA_ARGS__);                               \
+      case CV_32F: return function_name<float>(__VA_ARGS__);                                 \
+      case CV_64F: return function_name<double>(__VA_ARGS__);                                \
+      default: throw std::runtime_error("Unsupported data type: " + rcv::type2string(type)); \
+    };                                                                                       \
+  }()
+  
+  //! Dispatch an image to a function which takes the underlying image data type as a template parameter and has no return type
+  /*! \see RCV_DISPATCH for an example */
+#define RCV_DISPATCH_NO_RETURN(type, function_name, ...)                                     \
+  [&]() {                                                                                    \
+    switch(CV_MAT_TYPE(type))                                                                \
+    {                                                                                        \
+      case CV_8U:  function_name<uint8_t>(__VA_ARGS__);   break;                             \
+      case CV_8S:  function_name<int8_t>(__VA_ARGS__);    break;                             \
+      case CV_16U: function_name<uint16_t>(__VA_ARGS__);  break;                             \
+      case CV_16S: function_name<int16_t>(__VA_ARGS__);   break;                             \
+      case CV_32S: function_name<int32_t>(__VA_ARGS__);   break;                             \
+      case CV_32F: function_name<float>(__VA_ARGS__);     break;                             \
+      case CV_64F: function_name<double>(__VA_ARGS__);    break;                             \
+      default: throw std::runtime_error("Unsupported data type: " + rcv::type2string(type)); \
+    };                                                                                       \
+  }()
 
   // ######################################################################
   //! Concatenate the left and the right images horizontally
@@ -174,8 +255,35 @@ namespace rcv
   class cubehelix
   {
     public:
+
+      struct create
+      {
+        create() :
+          nlev_(256), start_(0.5), rot_(-1.5), gamma_(1.0), hue_(1.2), reverse_(false) 
+        { }
+
+        operator cubehelix()
+        {
+          return cubehelix(nlev_, start_, rot_, gamma_, hue_, reverse_);
+        }
+
+        create & nlev(size_t val)  { nlev_    = val; return *this; }
+        create & start(float val)  { start_   = val; return *this; }
+        create & rot(float val)    { rot_     = val; return *this; }
+        create & gamma(float val)  { gamma_   = val; return *this; }
+        create & hue(float val)    { hue_     = val; return *this; }
+        create & reverse()         { reverse_ = !reverse_; return *this; }
+
+        size_t nlev_;
+        float start_, rot_, gamma_, hue_;
+        bool reverse_;
+      };
+
+
       //! Construct a cubehelix object and initialize it's mapping tables
       /*! 
+        @param nlev The number of color levels in the color map.
+
         @param start The starting position in the color space. 0=blue, 1=red, 2=green. Defaults to 0.5.
 
         @param rot The number of rotations through the rainbow. Can be positive 
@@ -189,8 +297,8 @@ namespace rcv
         @param reverse Set to True to reverse the color map. Will go from black to
         white. Good for density plots where shade~density.
         */
-      cubehelix(float start=0.5, float rot=-1.5, float gamma=1.0, float hue=1.2, bool reverse=false) :
-        nlev(256)
+      cubehelix(size_t nlev=256, float start=0.5, float rot=-1.5, float gamma=1.0, float hue=1.2, bool reverse=false) :
+        nlev(nlev)
     {
       // Set up the parameters
       std::vector<double> fract(nlev);
@@ -217,10 +325,11 @@ namespace rcv
         double const c = std::cos(angle[i]);
         double const f = fract[i];
         double const a = amp[i];
-        red_[i] = std::max(0.0, std::min(1.0, f+a*(-0.14861*c + 1.78277*s)))*255;
-        grn_[i] = std::max(0.0, std::min(1.0, f+a*(-0.29227*c - 0.90649*s)))*255;
-        blu_[i] = std::max(0.0, std::min(1.0, f+a*(1.97294*c )))*255;
+        red_[i] = std::max(0.0, std::min( 255.0, std::round((f+a*(-0.14861*c + 1.78277*s))*255.0)));
+        grn_[i] = std::max(0.0, std::min( 255.0, std::round((f+a*(-0.29227*c - 0.90649*s))*255.0)));
+        blu_[i] = std::max(0.0, std::min( 255.0, std::round((f+a*(1.97294*c))*255.0)));
       }
+
 
       if(reverse)
       {
@@ -237,18 +346,20 @@ namespace rcv
           throw std::runtime_error(
               "Too many channels (" + std::to_string(input.channels()) + ") in input image");
 
-        switch(CV_MAT_TYPE(input.type()))
-        {
-          case CV_8U: return process<uint8_t>(input);
-          case CV_8S: return process<int8_t>(input);
-          case CV_16U: return process<uint16_t>(input);
-          case CV_16S: return process<int16_t>(input);
-          case CV_32S: return process<int32_t>(input);
-          case CV_32F: return process<float>(input);
-          case CV_64F: return process<double>(input);
-          default: throw std::runtime_error("Unsupported data type: " +
-                       std::to_string(CV_MAT_TYPE(input.type())));
-        };
+        return RCV_DISPATCH(input.type(), process, input);
+
+        //switch(CV_MAT_TYPE(input.type()))
+        //{
+        //  case CV_8U:  return process<uint8_t>(input);
+        //  case CV_8S:  return process<int8_t>(input);
+        //  case CV_16U: return process<uint16_t>(input);
+        //  case CV_16S: return process<int16_t>(input);
+        //  case CV_32S: return process<int32_t>(input);
+        //  case CV_32F: return process<float>(input);
+        //  case CV_64F: return process<double>(input);
+        //  default: throw std::runtime_error("Unsupported data type: " +
+        //               std::to_string(CV_MAT_TYPE(input.type())));
+        //};
       }
 
    private:
@@ -257,6 +368,7 @@ namespace rcv
       {
         double minv, maxv;
         cv::minMaxLoc(input, &minv, &maxv);
+        std::cout << "minmax: " << minv << ", " << maxv << std::endl;
 
         if(minv == maxv) return cv::Mat::zeros(input.rows, input.cols, CV_8UC3);
         cv::Mat ret(input.size(), CV_8UC3);
