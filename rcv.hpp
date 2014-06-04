@@ -25,7 +25,12 @@ namespace rcv
   template<> struct type2cv<double>   { static const int value = CV_64F; };
 
   //! Convert a CV_* type (from cv::Mat.type()) to a human readable string
-  /*! Implementation ripped from http://stackoverflow.com/a/12336381/237092 */
+  /*! For example:
+   * @code
+   * cv::Mat mat = poorly_documented_function();
+   * std::cout << "My matrix is of type: " << rcv::type2string(mat.type()) << std::endl;
+   * @endcode
+   * \note Implementation ripped from http://stackoverflow.com/a/12336381/237092 */
   std::string type2string(int imgTypeInt)
   {
     int numImgTypes = 35; // 7 base types, with five channel options each (none or C1, ..., C4)
@@ -56,7 +61,12 @@ namespace rcv
   }
 
   //! Dispatch an image to a function which takes the underlying image data type as a template parameter
-  /*! Example:
+  /*! This is helpful e.g. when you need to access the pixel values of an
+   * image, but you don't know that image's type. Using the .at() method
+   * requires a template parameter, so RCV_DISPATCH can be used to call the
+   * proper templated method.
+   
+   * Example:
    * @code
    * template<class T>
    *   bool my_function(float param1, float param2, cv::Mat image, float param3)
@@ -70,6 +80,8 @@ namespace rcv
    * bool result = RCV_DISPATCH(my_unknown_matrix.type(), my_function,
    *   1.0, 2.0, my_unknown_matrix, 3.0);
    * @endcode
+   *
+   * \TODO Implement this without macros
    * */
 #define RCV_DISPATCH(type, function_name, ...)                                               \
   [&]() {                                                                                    \

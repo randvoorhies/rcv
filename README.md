@@ -7,6 +7,13 @@ This is a set of general purpose OpenCV helpers that I have accumulated over the
 ```cpp
 #include "rcv.hpp"
 
+template<class T>
+bool pixel_check(int r, int c, cv::Mat image, double param)
+{
+  assert(image.channels() == 1);
+  return image.at<T>(r,c) < param;
+}
+
 int main()
 {
   cv::Mat image0, image1, image2, image3;
@@ -39,12 +46,20 @@ int main()
   
   // Plot with a fixed scale (from 0 to 1) and a red line
   cv::Mat plot = rcv::plot(values.begin(), values.end(), cv::Size(300, 100), 0.0, 1.0, cv::Scalar(0,0,255));
+
+  // Plot with an autoscaled minimum value, a fixed maximum value and a blue line
+  cv::Mat plot = rcv::plot(values.begin(), values.end(), cv::Size(300, 100), rcv::autoscale, 100.0, cv::Scalar(0,0,255));
   
   ////////////////// Color Mapping //////////////////
   
   // Dave Green's cubehelix algorithm is implemented to create beautiful RGB colormaps from single-channel data
   rcv::cubehelix maphelix;
   cv::Mat beautifulimage = maphelix(image0);
+
+  ////////////////// Type Dispatching //////////////////
+
+  cv::Mat mysterious_matrix = getMysteriousMatrix();
+  bool pixel_ok = RCV_DISPATCH(mysterious_matrix.type(), 0, 0, mysterious_matrix, 30.0);
 
   return 0;
 }
