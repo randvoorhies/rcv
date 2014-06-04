@@ -124,6 +124,10 @@ namespace rcv
 
   // ######################################################################
   //! Concatenate a set of images horizontally
+  /*! Use this version to concatenate more than two images, e.g.
+   * @code
+   * cv::Mat display = rcv::hcat({first_image, second_image, third_image, fourth_image});
+   * @endcode*/
   cv::Mat hcat(std::vector<cv::Mat> const & images, cv::Scalar fill = cv::Scalar(0))
   {
     if(images.empty()) return cv::Mat();
@@ -169,6 +173,10 @@ namespace rcv
 
   // ######################################################################
   //! Concatenate a set of images vertically
+  /*! Use this version to concatenate more than two images, e.g.
+   * @code
+   * cv::Mat display = rcv::vcat({first_image, second_image, third_image, fourth_image});
+   * @endcode*/
   cv::Mat vcat(std::vector<cv::Mat> const & images, cv::Scalar fill = cv::Scalar(0))
   {
     if(images.empty()) return cv::Mat();
@@ -220,14 +228,23 @@ namespace rcv
 
   // ######################################################################
   //! Plot the values as a simple line plot
+  /*! Both the minimum and maximum values can be autoscaled by passing the special rcv::autoscale value to them.
+   *  @param begin An iterator pointing to the beginning of the data to plot
+   *  @param end An iterator pointing to one past the end of the data to plot
+   *  @param plot_size The size of the plot (in pixels), given as cv::Size(width,height)
+   *  @param min_value The minimum value to plot, or rcv::autoscale to automatically scale this value 
+   *  @param max_value The maximum value to plot, or rcv::autoscale to automatically scale this value
+   *  @param line_color The color of the plot line 
+   *  @param line_width The width of the plot line
+   *  @param image_type The type of image to create */
   template<class Iterator, class MinScaleValue=AutoScaleIndicator, class MaxScaleValue=AutoScaleIndicator>
   cv::Mat plot(Iterator const begin, Iterator const end, cv::Size plot_size,
       MinScaleValue min_value = autoscale, MaxScaleValue max_value = autoscale,
-      cv::Scalar line_color=cv::Scalar(255), int line_width=1)
+      cv::Scalar line_color=cv::Scalar::all(255), int line_width=1, int image_type=CV_8UC3)
   {
     typedef typename std::remove_reference<decltype(*begin)>::type T;
 
-    cv::Mat plot = cv::Mat::zeros(plot_size, CV_8UC3);
+    cv::Mat plot = cv::Mat::zeros(plot_size, image_type);
 
     T min_value_ = get_min_value(begin, end, min_value);
     T max_value_ = get_max_value(begin, end, max_value);
