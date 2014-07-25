@@ -8,6 +8,8 @@
 #include <type_traits>
 #include <typeindex>
 #include <stdexcept>
+#include <iomanip>
+#include <sstream>
 
 #include <iostream>
 
@@ -58,6 +60,32 @@ namespace rcv
       if(imgTypeInt == enum_ints[i]) return enum_strings[i];
     }
     return "unknown image type";
+  }
+
+  //! Get the standard "white" value for a given OpenCV data type
+  /*! For example, CV_8U images typically use 255 as their white value, while CV32F images typically use 1.0
+   * @code
+   * double white = rcv::white_value(myMat.type());
+   * @endcode
+   * */
+  double constexpr white_value(int mat_type)
+  {
+    return CV_MAT_TYPE(mat_type) == CV_8U ? 255.0 :
+      (
+       CV_MAT_TYPE(mat_type) == CV_16U ? 65536.0 : 
+       (
+        1.0
+       )
+      );
+  }
+
+  //! Convert a cv::Mat, and scale it to the typical range for the destination type
+  /*! \sa white_value */
+  cv::Mat convert_and_scale(cv::Mat const & image, int const rtype)
+  {
+    cv::Mat result;
+    image.convertTo(result, rtype, white_value(rtype) / white_value(image.type()));
+    return result;
   }
 
   //! Dispatch an image to a function which takes the underlying image data type as a template parameter
@@ -252,7 +280,7 @@ namespace rcv
   template<class Iterator, class MinScaleValue=AutoScaleIndicator, class MaxScaleValue=AutoScaleIndicator>
   cv::Mat plot(Iterator const begin, Iterator const end, cv::Size plot_size,
       MinScaleValue min_value = autoscale, MaxScaleValue max_value = autoscale,
-      cv::Scalar line_color=cv::Scalar::all(255), int line_width=1, int image_type=CV_8UC3)
+      cv::Scalar line_color=cv::Scalar::all(255), int line_width=1, int image_type=CV_8UC3, bool write_limits = false)
   {
     typedef typename std::remove_reference<decltype(*begin)>::type T;
 
@@ -274,6 +302,23 @@ namespace rcv
       cv::line(plot, cv::Point(old_x, plot_size.height - old_y - 1), cv::Point(x, plot_size.height - y - 1), line_color, line_width);
       old_x = x;
       old_y = y;
+    }
+
+    if(write_limits)
+    {
+      auto to_string = [](T value)
+      {
+        std::ostringstream out;
+        out << std::setprecision(2) << std::fixed << value;
+        return out.str();
+      };
+
+      int baseline;
+      auto const font = CV_FONT_HERSHEY_PLAIN;
+      float const font_scale = 1.0;
+      cv::Size max_loc = cv::getTextSize(to_string(max_value_), font, font_scale, 1, &baseline);
+      cv::putText(plot, to_string(max_value_), cv::Point(0, max_loc.height+5), font, font_scale, cv::Scalar::all(255));
+      cv::putText(plot, to_string(min_value_), cv::Point(0, plot.rows-5), font, font_scale, cv::Scalar::all(255));
     }
     return plot; 
   }
@@ -376,19 +421,6 @@ namespace rcv
               "Too many channels (" + std::to_string(input.channels()) + ") in input image");
 
         return RCV_DISPATCH(input.type(), process, input);
-
-        //switch(CV_MAT_TYPE(input.type()))
-        //{
-        //  case CV_8U:  return process<uint8_t>(input);
-        //  case CV_8S:  return process<int8_t>(input);
-        //  case CV_16U: return process<uint16_t>(input);
-        //  case CV_16S: return process<int16_t>(input);
-        //  case CV_32S: return process<int32_t>(input);
-        //  case CV_32F: return process<float>(input);
-        //  case CV_64F: return process<double>(input);
-        //  default: throw std::runtime_error("Unsupported data type: " +
-        //               std::to_string(CV_MAT_TYPE(input.type())));
-        //};
       }
 
    private:
@@ -397,7 +429,6 @@ namespace rcv
       {
         double minv, maxv;
         cv::minMaxLoc(input, &minv, &maxv);
-        std::cout << "minmax: " << minv << ", " << maxv << std::endl;
 
         if(minv == maxv) return cv::Mat::zeros(input.rows, input.cols, CV_8UC3);
         cv::Mat ret(input.size(), CV_8UC3);
