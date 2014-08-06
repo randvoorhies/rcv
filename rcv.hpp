@@ -147,7 +147,10 @@ namespace rcv
   //! Concatenate the left and the right images horizontally
   cv::Mat hcat(cv::Mat left, cv::Mat right, cv::Scalar fill = cv::Scalar(0))
   {
-    assert(left.type() == right.type());
+    if(left.type() != right.type())
+      throw std::runtime_error("In rcv::hcat: mismatched types between "
+          "left (" + rcv::type2string(left.type()) + ") "
+          "and right (" + rcv::type2string(right.type()) + ")");
 
     int const rows = std::max(left.rows, right.rows);
     int const cols = left.cols + right.cols;
@@ -173,8 +176,11 @@ namespace rcv
     if(images.empty()) return cv::Mat();
     if(images.size() == 1) return images[0];
 
-    assert(std::all_of(images.begin(), images.end(),
-          [images](cv::Mat const & image) { return image.type() == images[0].type(); }));
+    for(size_t i=1; i<images.size(); ++i)
+      if(images[i].type() != images[0].type())
+        throw std::runtime_error("In rcv::hcat: mismatched types between "
+            "images[0] (" + rcv::type2string(images[0].type()) + ") "
+            "and images[" + std::to_string(i) + "] (" + rcv::type2string(images[i].type()) + ")");
 
     int const rows = std::max_element(images.begin(), images.end(), [](cv::Mat a, cv::Mat b) { return a.rows < b.rows; })->rows;
     int cols = std::accumulate(images.begin(), images.end(), 0, [](int n, cv::Mat m) { return n+m.cols; });
@@ -196,7 +202,10 @@ namespace rcv
   //! Concatenate the top and the bottom images vertically
   cv::Mat vcat(cv::Mat top, cv::Mat bottom, cv::Scalar fill = cv::Scalar(0))
   {
-    assert(top.type() == bottom.type());
+    if(top.type() != bottom.type())
+      throw std::runtime_error("In rcv::vcat: mismatched types between "
+          "top (" + rcv::type2string(top.type()) + ") "
+          "and bottom (" + rcv::type2string(bottom.type()) + ")");
 
     int const rows = top.rows + bottom.rows;
     int const cols = std::max(top.cols, bottom.cols);
@@ -222,8 +231,11 @@ namespace rcv
     if(images.empty()) return cv::Mat();
     if(images.size() == 1) return images[0];
 
-    assert(std::all_of(images.begin(), images.end(),
-          [images](cv::Mat const & image) { return image.type() == images[0].type(); }));
+    for(size_t i=1; i<images.size(); ++i)
+      if(images[i].type() != images[0].type())
+        throw std::runtime_error("In rcv::vcat: mismatched types between "
+            "images[0] (" + rcv::type2string(images[0].type()) + ") "
+            "and images[" + std::to_string(i) + "] (" + rcv::type2string(images[i].type()) + ")");
 
     int rows = std::accumulate(images.begin(), images.end(), 0, [](int n, cv::Mat m) { return n+m.rows; });
     int const cols = std::max_element(images.begin(), images.end(), [](cv::Mat a, cv::Mat b) { return a.cols < b.cols; })->cols;
