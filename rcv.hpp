@@ -113,7 +113,7 @@ namespace rcv
    *   1.0, 2.0, my_unknown_matrix, 3.0);
    * @endcode
    *
-   * \TODO Implement this without macros
+   * \todo Implement this without macros
    * */
 #define RCV_DISPATCH(type, function_name, ...)                                               \
   [&]() {                                                                                    \
