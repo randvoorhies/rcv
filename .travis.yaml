@@ -1,0 +1,35 @@
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -qq doxygen
+env:
+  global:
+    - secure: "JobhcBdphLDRa+0udHedUnxsADQ06WrdX6XIZuM1ObHjRkFwU10cAscwfqsnzwhNs5r3JBqCCsgx7x06B/YtGIWP6DQun9BPdTEvMGorWzDAciTgu7rOD3rGPql/VApzrQIrBLvJRL+b9Pp517waDg3VLZJ+YCeY0nicVGPdUno="
+script:
+  - ## the following automatically builds the doxygen
+  - ## documentation and pushes it to the gh_pages branch
+  -
+  - # First, set up credentials using the environment variables
+  - # GIT_NAME, GIT_EMAIL and GH_TOKEN. These were passed
+  - # encrypted to travis and should have been decrypted
+  - # using travis' private key before this script was run.
+  - git config --global user.name "${GIT_NAME}"
+  - git config --global user.email ${GIT_EMAIL}
+  -
+  - # now we make the directory for the docs and cd into it
+  - mkdir developmentDocs
+  - cd developmentDocs/
+  -
+  - # clone the whole repo again, but switch to gh_pages branch
+  - git clone https://github.com/randvoorhies/rcv .
+  - git checkout gh-pages
+  -
+  - # go back up and build the documentation, pointing it towards
+  - # that dir we just made
+  - cd ../
+  - doxygen doxygen.cfg
+  -
+  - # cd into the docs dir and commit and push the new docs.
+  - cd developmentDocs
+  - git add --all .
+  - git commit -m "Auto-updating Doxygen developer documentation"
+  - git push https://${GH_TOKEN}@github.com/randvoorhies/rcv gh-pages
