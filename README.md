@@ -61,7 +61,7 @@ int main()
   ////////////////// Type Dispatching //////////////////
 
   cv::Mat mysterious_matrix = getMysteriousMatrix();
-  bool pixel_ok = RCV_DISPATCH(mysterious_matrix.type(), 0, 0, mysterious_matrix, 30.0);
+  bool pixel_ok = RCV_DISPATCH(mysterious_matrix.type(), pixel_check, 0, 0, mysterious_matrix, 30.0);
 
   return 0;
 }
