@@ -54,14 +54,16 @@ int main()
   
   ////////////////// Color Mapping //////////////////
   
-  // Dave Green's cubehelix algorithm is implemented to create beautiful RGB colormaps from single-channel data
+  // Dave Green's cubehelix algorithm is implemented to create beautiful RGB 
+  // colormaps from single-channel data
   rcv::cubehelix maphelix;
   cv::Mat beautifulimage = maphelix(image0);
 
   ////////////////// Type Dispatching //////////////////
 
   cv::Mat mysterious_matrix = getMysteriousMatrix();
-  bool pixel_ok = RCV_DISPATCH(mysterious_matrix.type(), pixel_check, 0, 0, mysterious_matrix, 30.0);
+  bool pixel_ok = RCV_DISPATCH(mysterious_matrix.type(),
+                               pixel_check, 0, 0, mysterious_matrix, 30.0);
 
   return 0;
 }
