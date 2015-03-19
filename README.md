@@ -4,6 +4,8 @@ rcv::
 
 This is a set of general purpose OpenCV helpers that I have accumulated over the years. Here's an example of some of the library's functionality:
 
+For more documentation, check out the [doxygen pages](http://randvoorhies.github.io/rcv/modules.html).
+
 ```cpp
 #include "rcv.hpp"
 

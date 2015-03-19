@@ -15,6 +15,10 @@
 
 namespace rcv
 {
+
+  /*! \defgroup TypeUtils Type Utilities 
+      Various utilities to help out with the inherent type unsafety of OpenCV
+      @{ */
   //! Get the CV_ flag for a given numeric type
   /*! E.g. type2cv<int16_t>::value will resolve to CV_16S */
   template<class T> struct type2cv {};
@@ -143,8 +147,27 @@ namespace rcv
     };                                                                                       \
   }()
 
+  /*! @} */
+
+  /*! \defgroup ImageConcatentation Image Concatenation
+      Paste two or more images together, generally for display purposes
+
+      \warning These methods are totally unoptimized. A real implementation
+      would use lazy evaluation to make one copy of the pixels at the last
+      moment. This is not implemented yet, so do not use in performance
+      sensitive code.
+
+      @{
+  */
+
   // ######################################################################
   //! Concatenate the left and the right images horizontally
+  /*! Use this version to concatenate two images
+   *
+   * @param left The left image
+   * @param right The right image
+   * @param fill A color to fill in the background of an image if it is smaller than the other
+   */
   cv::Mat hcat(cv::Mat left, cv::Mat right, cv::Scalar fill = cv::Scalar(0))
   {
     if(left.type() != right.type())
@@ -168,9 +191,15 @@ namespace rcv
   // ######################################################################
   //! Concatenate a set of images horizontally
   /*! Use this version to concatenate more than two images, e.g.
+   *
+   * Example:
    * @code
    * cv::Mat display = rcv::hcat({first_image, second_image, third_image, fourth_image});
-   * @endcode*/
+   * @endcode
+   *
+   * @param images A list of images to be concatenated in left-to-right order
+   * @param fill A color to fill in the background of an image if it is smaller than the other
+   */
   cv::Mat hcat(std::vector<cv::Mat> const & images, cv::Scalar fill = cv::Scalar(0))
   {
     if(images.empty()) return cv::Mat();
@@ -200,6 +229,12 @@ namespace rcv
  
   // ######################################################################
   //! Concatenate the top and the bottom images vertically
+  /*! Use this version to concatenate two images
+   *
+   * @param top The top image
+   * @param bottom The bottom image
+   * @param fill A color to fill in the background of an image if it is smaller than the other
+   */
   cv::Mat vcat(cv::Mat top, cv::Mat bottom, cv::Scalar fill = cv::Scalar(0))
   {
     if(top.type() != bottom.type())
@@ -223,9 +258,15 @@ namespace rcv
   // ######################################################################
   //! Concatenate a set of images vertically
   /*! Use this version to concatenate more than two images, e.g.
+   *
+   * Example:
    * @code
    * cv::Mat display = rcv::vcat({first_image, second_image, third_image, fourth_image});
-   * @endcode*/
+   * @endcode
+   *
+   * @param images A list of images to be concatenated in bottom-to-top order
+   * @param fill A color to fill in the background of an image if it is smaller than the other
+   */
   cv::Mat vcat(std::vector<cv::Mat> const & images, cv::Scalar fill = cv::Scalar(0))
   {
     if(images.empty()) return cv::Mat();
@@ -253,9 +294,15 @@ namespace rcv
 
     return ret;
   }
+  /*! @} */
+
+  /*! \defgroup Plotting Plotting Utilities 
+       Very simple line plotting
+      @{ */
 
   // ######################################################################
   class AutoScaleIndicator { };
+  //! An indicator to tell plot() that a value should be automatically scaled
   AutoScaleIndicator autoscale;
 
   template<class Iterator, class MaxScaleValue> 
@@ -288,7 +335,8 @@ namespace rcv
    *  @param max_value The maximum value to plot, or rcv::autoscale to automatically scale this value
    *  @param line_color The color of the plot line 
    *  @param line_width The width of the plot line
-   *  @param image_type The type of image to create */
+   *  @param image_type The type of image to create 
+   *  @param write_limits Show the minimum and maximum values on the plot */
   template<class Iterator, class MinScaleValue=AutoScaleIndicator, class MaxScaleValue=AutoScaleIndicator>
   cv::Mat plot(Iterator const begin, Iterator const end, cv::Size plot_size,
       MinScaleValue min_value = autoscale, MaxScaleValue max_value = autoscale,
@@ -334,6 +382,11 @@ namespace rcv
     }
     return plot; 
   }
+
+  /*! @} */
+
+  /*! \defgroup Colorizing Image Colorizing Utilities
+      @{ */ 
 
   // ######################################################################
   //! Colorize the input using Dave Green's 'cubehelix' algorithm
@@ -458,7 +511,17 @@ namespace rcv
       size_t const nlev;
       std::vector<uint8_t> red_, blu_, grn_;
   };
+  /*! @} */
 
 }
+
+/*!
+ * \mainpage rcv:: Rand's OpenCV Utilities
+ *
+ * Please see the <a href="modules.html">Modules</a> page for the bulk of the documentation.
+ 
+*/
+
+
 #endif // RCV_HPP
 
