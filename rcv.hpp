@@ -390,11 +390,29 @@ namespace rcv
 
   // ######################################################################
   //! Colorize the input using Dave Green's 'cubehelix' algorithm
-  /*! This implementation based on Jim Davenport's python implementation found here: https://github.com/jradavenport/cubehelix/ */
+  /*! This implementation based on Jim Davenport's python implementation found here: https://github.com/jradavenport/cubehelix/ 
+
+    cubehelix contains a handy named parameter creation helper,
+    @code
+    cubehelix colorizer = cubehelix::create().start(.6).rot(1.5).nlev(128).reverse();
+
+    cv::Mat grayscale;
+    cv::Mat colorized = colorizer(grayscale);
+    @endcode
+   
+   
+   */
   class cubehelix
   {
     public:
 
+      //! A helper struct to create cubehelix instances using named parameters
+      /*! @code
+          cubehelix colorizer = cubehelix::create().start(.6).rot(1.5).nlev(128).reverse();
+
+          cv::Mat grayscale;
+          cv::Mat colorized = colorizer(grayscale);
+          @endcode */
       struct create
       {
         create() :
@@ -406,11 +424,25 @@ namespace rcv
           return cubehelix(nlev_, start_, rot_, gamma_, hue_, reverse_);
         }
 
-        create & nlev(size_t val)  { nlev_    = val; return *this; }
-        create & start(float val)  { start_   = val; return *this; }
-        create & rot(float val)    { rot_     = val; return *this; }
-        create & gamma(float val)  { gamma_   = val; return *this; }
-        create & hue(float val)    { hue_     = val; return *this; }
+        //! The number of color levels in the color map.
+        create & nlev(size_t val)  { nlev_ = val; return *this; }
+
+        //! The starting position in the color space. 0=blue, 1=red, 2=green. Defaults to 0.5.
+        create & start(float val)  { start_ = val; return *this; }
+
+        //! The number of rotations through the rainbow.
+        /*! Can be positive or negative, indicating direction of rainbow.
+            Negative values correspond to Blue->Red direction. */
+        create & rot(float val)    { rot_ = val; return *this; }
+
+        //! The gamma correction for intensity.
+        create & gamma(float val)  { gamma_ = val; return *this; }
+
+        //! The hue intensity factor.
+        create & hue(float val)    { hue_ = val; return *this; }
+
+        //! Set to True to reverse the color map.
+        /*! Will go from black to white. Good for density plots where shade~density. */
         create & reverse()         { reverse_ = !reverse_; return *this; }
 
         size_t nlev_;
@@ -420,7 +452,7 @@ namespace rcv
 
 
       //! Construct a cubehelix object and initialize it's mapping tables
-      /*! 
+      /*! There are a lot of parameters here, so you can use the cubehelix::create class if you want named parameters
         @param nlev The number of color levels in the color map.
 
         @param start The starting position in the color space. 0=blue, 1=red, 2=green. Defaults to 0.5.
