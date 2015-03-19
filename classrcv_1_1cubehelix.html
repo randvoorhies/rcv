@@ -99,6 +99,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a>  </div>
   <div class="headertitle">
 <div class="title">rcv::cubehelix Class Reference<div class="ingroups"><a class="el" href="group__Colorizing.html">Image Colorizing Utilities</a></div></div>  </div>
@@ -112,6 +113,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><a href="classrcv_1_1cubehelix-members.html">List of all members.</a></p>
 <table class="memberdecls">
+<tr><td colspan="2"><h2><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrcv_1_1cubehelix_1_1create.html">create</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A helper struct to create cubehelix instances using named parameters.  <a href="structrcv_1_1cubehelix_1_1create.html#details">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrcv_1_1cubehelix.html#a3e972d476fe27ca00ee0da8bd99a5ce8">cubehelix</a> (size_t nlev=256, float start=0.5, float rot=-1.5, float gamma=1.0, float hue=1.2, bool reverse=false)</td></tr>
@@ -122,8 +127,13 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Colorize the input using Dave Green's 'cubehelix' algorithm. </p>
-<p>This implementation based on Jim Davenport's python implementation found here: <a href="https://github.com/jradavenport/cubehelix/">https://github.com/jradavenport/cubehelix/</a> </p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<p>This implementation based on Jim Davenport's python implementation found here: <a href="https://github.com/jradavenport/cubehelix/">https://github.com/jradavenport/cubehelix/</a></p>
+<p>cubehelix contains a handy named parameter creation helper, </p>
+<div class="fragment"><pre class="fragment">    <a class="code" href="classrcv_1_1cubehelix.html#a3e972d476fe27ca00ee0da8bd99a5ce8" title="Construct a cubehelix object and initialize it&#39;s mapping tables.">cubehelix</a> colorizer = cubehelix::create().start(.6).rot(1.5).nlev(128).reverse();
+
+    cv::Mat grayscale;
+    cv::Mat colorized = colorizer(grayscale);
+</pre></div> </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a3e972d476fe27ca00ee0da8bd99a5ce8"></a><!-- doxytag: member="rcv::cubehelix::cubehelix" ref="a3e972d476fe27ca00ee0da8bd99a5ce8" args="(size_t nlev=256, float start=0.5, float rot=&#45;1.5, float gamma=1.0, float hue=1.2, bool reverse=false)" -->
 <div class="memitem">
 <div class="memproto">
@@ -174,6 +184,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div class="memdoc">
 
 <p>Construct a cubehelix object and initialize it's mapping tables. </p>
+<p>There are a lot of parameters here, so you can use the <a class="el" href="structrcv_1_1cubehelix_1_1create.html" title="A helper struct to create cubehelix instances using named parameters.">cubehelix::create</a> class if you want named parameters </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">nlev</td><td>The number of color levels in the color map.</td></tr>
@@ -209,7 +220,7 @@ cv::Mat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 19 2015 02:08:02 for rcv by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 19 2015 02:17:59 for rcv by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

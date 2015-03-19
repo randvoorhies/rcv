@@ -47,6 +47,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -98,46 +100,84 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a>  </div>
+<a href="#pub-methods">Public Member Functions</a>  </div>
   <div class="headertitle">
 <div class="title">rcv::cubehelix::create Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <!-- doxytag: class="rcv::cubehelix::create" -->
+<p>A helper struct to create cubehelix instances using named parameters.  
+ <a href="structrcv_1_1cubehelix_1_1create.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="rcv_8hpp_source.html">rcv.hpp</a>&gt;</code></p>
+
 <p><a href="structrcv_1_1cubehelix_1_1create-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a450e249f940a520d598547ee961002dc"></a><!-- doxytag: member="rcv::cubehelix::create::operator cubehelix" ref="a450e249f940a520d598547ee961002dc" args="()" -->
-&#160;</td><td class="memItemRight" valign="bottom"><b>operator cubehelix</b> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afec3798c605bf16a577256f7e48cacc6"></a><!-- doxytag: member="rcv::cubehelix::create::nlev" ref="afec3798c605bf16a577256f7e48cacc6" args="(size_t val)" -->
-<a class="el" href="structrcv_1_1cubehelix_1_1create.html">create</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>nlev</b> (size_t val)</td></tr>
+<a class="el" href="structrcv_1_1cubehelix_1_1create.html">create</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrcv_1_1cubehelix_1_1create.html#afec3798c605bf16a577256f7e48cacc6">nlev</a> (size_t val)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of color levels in the color map. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5de5976acd90fc5444f00fe0e80f1f0a"></a><!-- doxytag: member="rcv::cubehelix::create::start" ref="a5de5976acd90fc5444f00fe0e80f1f0a" args="(float val)" -->
-<a class="el" href="structrcv_1_1cubehelix_1_1create.html">create</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>start</b> (float val)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a061caef984a13bf95fd296387ac719fe"></a><!-- doxytag: member="rcv::cubehelix::create::rot" ref="a061caef984a13bf95fd296387ac719fe" args="(float val)" -->
-<a class="el" href="structrcv_1_1cubehelix_1_1create.html">create</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>rot</b> (float val)</td></tr>
+<a class="el" href="structrcv_1_1cubehelix_1_1create.html">create</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrcv_1_1cubehelix_1_1create.html#a5de5976acd90fc5444f00fe0e80f1f0a">start</a> (float val)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The starting position in the color space. 0=blue, 1=red, 2=green. Defaults to 0.5. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="structrcv_1_1cubehelix_1_1create.html">create</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrcv_1_1cubehelix_1_1create.html#a061caef984a13bf95fd296387ac719fe">rot</a> (float val)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of rotations through the rainbow.  <a href="#a061caef984a13bf95fd296387ac719fe"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acfe84ab80fc0de115c76a848babfd0ab"></a><!-- doxytag: member="rcv::cubehelix::create::gamma" ref="acfe84ab80fc0de115c76a848babfd0ab" args="(float val)" -->
-<a class="el" href="structrcv_1_1cubehelix_1_1create.html">create</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>gamma</b> (float val)</td></tr>
+<a class="el" href="structrcv_1_1cubehelix_1_1create.html">create</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrcv_1_1cubehelix_1_1create.html#acfe84ab80fc0de115c76a848babfd0ab">gamma</a> (float val)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The gamma correction for intensity. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a26167a6aff5653e0425266e546753e6b"></a><!-- doxytag: member="rcv::cubehelix::create::hue" ref="a26167a6aff5653e0425266e546753e6b" args="(float val)" -->
-<a class="el" href="structrcv_1_1cubehelix_1_1create.html">create</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>hue</b> (float val)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1518a7086a839e7bb8f6616297301e49"></a><!-- doxytag: member="rcv::cubehelix::create::reverse" ref="a1518a7086a839e7bb8f6616297301e49" args="()" -->
-<a class="el" href="structrcv_1_1cubehelix_1_1create.html">create</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>reverse</b> ()</td></tr>
-<tr><td colspan="2"><h2><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8a18cba795b5cd9e030295f4251b47d2"></a><!-- doxytag: member="rcv::cubehelix::create::nlev_" ref="a8a18cba795b5cd9e030295f4251b47d2" args="" -->
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>nlev_</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa04c4da3454b5206401515870619eccd"></a><!-- doxytag: member="rcv::cubehelix::create::start_" ref="aa04c4da3454b5206401515870619eccd" args="" -->
-float&#160;</td><td class="memItemRight" valign="bottom"><b>start_</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2f0053f5127d6a34e027e82d48cc9d86"></a><!-- doxytag: member="rcv::cubehelix::create::rot_" ref="a2f0053f5127d6a34e027e82d48cc9d86" args="" -->
-float&#160;</td><td class="memItemRight" valign="bottom"><b>rot_</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2839b962c382c05b89b68b6a1a6d1b44"></a><!-- doxytag: member="rcv::cubehelix::create::gamma_" ref="a2839b962c382c05b89b68b6a1a6d1b44" args="" -->
-float&#160;</td><td class="memItemRight" valign="bottom"><b>gamma_</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5368f9b22f165787e09d2abf02bfd3f3"></a><!-- doxytag: member="rcv::cubehelix::create::hue_" ref="a5368f9b22f165787e09d2abf02bfd3f3" args="" -->
-float&#160;</td><td class="memItemRight" valign="bottom"><b>hue_</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae8d9beb3b98775422113f8496d1a92da"></a><!-- doxytag: member="rcv::cubehelix::create::reverse_" ref="ae8d9beb3b98775422113f8496d1a92da" args="" -->
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>reverse_</b></td></tr>
+<a class="el" href="structrcv_1_1cubehelix_1_1create.html">create</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrcv_1_1cubehelix_1_1create.html#a26167a6aff5653e0425266e546753e6b">hue</a> (float val)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The hue intensity factor. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="structrcv_1_1cubehelix_1_1create.html">create</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrcv_1_1cubehelix_1_1create.html#a1518a7086a839e7bb8f6616297301e49">reverse</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set to True to reverse the color map.  <a href="#a1518a7086a839e7bb8f6616297301e49"></a><br/></td></tr>
 </table>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><p>A helper struct to create cubehelix instances using named parameters. </p>
+<div class="fragment"><pre class="fragment">          <a class="code" href="classrcv_1_1cubehelix.html#a3e972d476fe27ca00ee0da8bd99a5ce8" title="Construct a cubehelix object and initialize it&#39;s mapping tables.">cubehelix</a> colorizer = cubehelix::create().start(.6).rot(1.5).nlev(128).reverse();
+
+          cv::Mat grayscale;
+          cv::Mat colorized = colorizer(grayscale);
+</pre></div> </div><hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a1518a7086a839e7bb8f6616297301e49"></a><!-- doxytag: member="rcv::cubehelix::create::reverse" ref="a1518a7086a839e7bb8f6616297301e49" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structrcv_1_1cubehelix_1_1create.html">create</a>&amp; <a class="el" href="structrcv_1_1cubehelix_1_1create.html#a1518a7086a839e7bb8f6616297301e49">rcv::cubehelix::create::reverse</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set to True to reverse the color map. </p>
+<p>Will go from black to white. Good for density plots where shade~density. </p>
+
+</div>
+</div>
+<a class="anchor" id="a061caef984a13bf95fd296387ac719fe"></a><!-- doxytag: member="rcv::cubehelix::create::rot" ref="a061caef984a13bf95fd296387ac719fe" args="(float val)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structrcv_1_1cubehelix_1_1create.html">create</a>&amp; <a class="el" href="structrcv_1_1cubehelix_1_1create.html#a061caef984a13bf95fd296387ac719fe">rcv::cubehelix::create::rot</a> </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>val</em></td><td>)</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>The number of rotations through the rainbow. </p>
+<p>Can be positive or negative, indicating direction of rainbow. Negative values correspond to Blue-&gt;Red direction. </p>
+
+</div>
+</div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
 <li><a class="el" href="rcv_8hpp_source.html">rcv.hpp</a></li>
 </ul>
@@ -159,7 +199,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>reverse_</b></td></tr
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 19 2015 01:12:21 for rcv by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 19 2015 02:17:59 for rcv by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
