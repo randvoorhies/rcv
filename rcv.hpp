@@ -12,6 +12,7 @@
 #include <sstream>
 
 #include <iostream>
+#include <numeric>
 
 namespace rcv
 {
