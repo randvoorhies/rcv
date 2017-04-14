@@ -1,6 +1,6 @@
 rcv::
 =======
-####Randolph Charles Voorhies' OpenCV utilities
+#### Randolph Charles Voorhies' OpenCV utilities
 
 This is a set of general purpose OpenCV helpers that I have accumulated over the years. Here's an example of some of the library's functionality:
 
